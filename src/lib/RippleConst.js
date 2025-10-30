@@ -13,44 +13,6 @@ const ServerOptions = [
 ]
 
 const MasterAddress = 'rBoy4AAAAA9qxv7WANSdP5j5y59NP6soJS'
-const SettingAddress = 'rE8VkMPnBo71FjmKuKGCitVXrKvL6f8MWd'
-
-const TxType = {
-  Payment: 'Payment',
-  OfferCreate: 'OfferCreate',
-  OfferCancel: 'OfferCancel',
-  TrustSet: 'TrustSet',
-  AccountDelete: 'AccountDelete'
-}
-
-const TxResult = {
-  Success: 'tesSUCCESS'
-}
-
-const PaySubAction = {
-  Normal: 'Normal',
-  Path: 'Path',
-  Play: 'Play'
-}
-
-const TableSetting = {
-  GameTxs: {
-    Name: 'GAME_TXS',
-    Key: 'tx_hash'
-  },
-  OperatorTxs: {
-    Name: 'OPERATOR_TXS',
-    Key: 'tx_hash'
-  },
-  Draws: {
-    Name: 'DRAWS',
-    Key: 'draw_id'
-  },
-  Breakdowns: {
-    Name: 'BREAKDOWNS',
-    Key: 'ticket_tx_hash'
-  }
-}
 
 const CodeColor = {
   0: 'border border-green-500 text-gray-800 dark:text-gray-300',
@@ -65,14 +27,9 @@ export {
   DefaultCoinIssuer,
   DefaultCoinCode,
   MasterAddress,
-  SettingAddress,
   XRP2DropRate,
   MainNetURL,
   TestNetURL,
   ServerOptions,
-  TxType,
-  TxResult,
-  TableSetting,
-  PaySubAction,
   CodeColor
 }

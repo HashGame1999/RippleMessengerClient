@@ -27,7 +27,9 @@ const MessengerSlice = createSlice({
     SessionList: [],
     CurrentSession: null,
     CurrentSessionMessageList: [],
-    FriendRequestList: []
+    FriendRequestList: [],
+    ComposeMemberList: [],
+    ComposeSpeakerList: [],
   },
   reducers: {
     updateMessengerConnStatus: (state, action) => {
@@ -81,6 +83,12 @@ const MessengerSlice = createSlice({
     setFriendRequestList: (state, action) => {
       state.FriendRequestList = action.payload
     },
+    setComposeMemberList: (state, action) => {
+      state.ComposeMemberList = action.payload
+    },
+    setComposeSpeakerList: (state, action) => {
+      state.ComposeSpeakerList = action.payload
+    },
   }
 })
 
@@ -103,6 +111,8 @@ export const {
   setSessionList,
   setCurrentSession,
   setCurrentSessionMessageList,
-  setFriendRequestList
+  setFriendRequestList,
+  setComposeMemberList,
+  setComposeSpeakerList
 } = MessengerSlice.actions
 export default MessengerSlice.reducer

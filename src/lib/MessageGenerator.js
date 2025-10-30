@@ -1,4 +1,5 @@
 import { QuarterSHA512Message } from './AppUtil'
+import { checkBulletinRequestSchema } from './MessageSchemaVerifier'
 import { ActionCode, ObjectType } from './MessengerConst'
 import { Sign } from './MessengerUtil'
 
@@ -99,7 +100,8 @@ export default class MessageGenerator {
       Timestamp: Date.now(),
       PublicKey: this.PublicKey
     }
-    return JSON.stringify(this.signJson(json))
+    json = this.signJson(json)
+    return JSON.stringify(json)
   }
 
   genFileRequest(type, hash, nonce, chunk_cursor, to) {
@@ -231,32 +233,32 @@ export default class MessageGenerator {
   // Group
 
   // Channel
-  genChannelCreate(channel_id, channel_name, speaker) {
+  genChannelCreate(hash, name, speaker) {
     let json = {
       ObjectType: ObjectType.ChannelCreate,
-      ChannelID: channel_id,
-      ChannelName: channel_name,
+      Hash: hash,
+      Name: name,
       Speaker: speaker,
       Timestamp: Date.now(),
       PublicKey: this.PublicKey,
     }
-    return JSON.stringify(this.signJson(json))
+    return this.signJson(json)
   }
 
-  genChannelDelete(channel_id) {
+  genChannelDelete(hash) {
     let json = {
       ObjectType: ObjectType.ChannelDelete,
-      ChannelID: channel_id,
+      Hash: hash,
       Timestamp: Date.now(),
       PublicKey: this.PublicKey,
     }
-    return JSON.stringify(this.signJson(json))
+    return this.signJson(json)
   }
 
-  genChannelMessage(channel_id, sequence, pre_hash, confirm, content, timestamp) {
+  genChannelMessage(hash, sequence, pre_hash, confirm, content, timestamp) {
     let json = {
       ObjectType: ObjectType.ChannelMessage,
-      ChannelID: channel_id,
+      Hash: hash,
       Sequence: sequence,
       PreHash: pre_hash,
       Confirm: confirm,

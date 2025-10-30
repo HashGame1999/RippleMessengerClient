@@ -37,7 +37,7 @@ function App() {
   const location = useLocation()
   const UnAuthPaths = ['/open']
   const AuthPaths = ['/setting', '/console', '/bulletin', '/bulletin_view', '/chat']
-  const GeneralPaths = ['/', '/about', '/histroy', '/draw']
+  const GeneralPaths = ['/', '/about', '/histroy']
 
   useEffect(() => {
     let isGeneralPath = GeneralPaths.includes(location.pathname)
@@ -165,7 +165,8 @@ function App() {
 
             {/* auth */}
             <Route path="/bulletin" element={<BulletinHomePage />} />
-            <Route path="/bulletin_view/:bulletin_hash" element={<BulletinViewPage />} />
+            <Route path="/bulletin_view" element={<BulletinViewPage />} />
+            {/* <Route path="/bulletin_view/:bulletin_hash" element={<BulletinViewPage />} /> */}
             <Route path="/chat" element={<ChatHomePage />} />
           </Routes>
         </div>

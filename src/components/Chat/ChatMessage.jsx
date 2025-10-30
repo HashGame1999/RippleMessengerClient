@@ -37,7 +37,7 @@ const ChatMessage = ({ message }) => {
           }
           {
             typeof message.Content === "object" && message.Content.ObjectType === MessageObjectType.Bulletin &&
-            <BulletinLink address={message.Content.Address} sequence={message.Content.Sequence} hash={message.Content.Hash} />
+            <BulletinLink address={message.Content.Address} sequence={message.Content.Sequence} hash={message.Content.Hash} sour_address={message.Sour} />
           }
           {
             typeof message.Content === "object" && message.Content.ObjectType === MessageObjectType.ChatFile &&

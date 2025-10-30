@@ -4,7 +4,7 @@ import Dexie from 'dexie'
 import * as rippleKeyPairs from 'ripple-keypairs'
 import { eventChannel, END } from 'redux-saga'
 import { call, delay, put, select, fork, takeEvery, takeLatest } from 'redux-saga/effects'
-import { setCurrentBulletin, setCurrentBulletinSequence, setCurrentFileList, setCurrentQuoteList, setCurrentSession, setCurrentSessionMessageList, setFollowBulletinList, setForwardBulletin, setForwardFlag, setFriendRequestList, setMineBulletinList, setPublishFlag, setRandomBulletin, setSessionList, updateMessengerConnStatus } from '../slices/MessengerSlice'
+import { setComposeMemberList, setComposeSpeakerList, setCurrentBulletin, setCurrentBulletinSequence, setCurrentFileList, setCurrentQuoteList, setCurrentSession, setCurrentSessionMessageList, setFollowBulletinList, setForwardBulletin, setForwardFlag, setFriendRequestList, setMineBulletinList, setPublishFlag, setRandomBulletin, setSessionList, updateMessengerConnStatus } from '../slices/MessengerSlice'
 import { checkAvatarRequestSchema, checkAvatarSchema, checkBulletinRequestSchema, checkBulletinSchema, checkChatDHSchema, checkChatMessageSchema, checkFileRequestSchema, checkMessageObjectSchema, deriveJson } from '../../lib/MessageSchemaVerifier'
 import MessageGenerator from '../../lib/MessageGenerator'
 import { ActionCode, FileRequestType, GenesisHash, FileMaxSize, FileChunkSize, ObjectType, SessionType, DefaultPartition, MessageObjectType, PrivateChatECDHString } from '../../lib/MessengerConst'
@@ -497,7 +497,7 @@ function* handelMessengerEvent(action) {
                       PreHash: json.PreHash,
                       Content: content,
                       SignedAt: json.Timestamp,
-                      CreatedAt: timestamp,
+                      // CreatedAt: timestamp,
                       Json: json,
                       Confirmed: 0,
                       Readed: 0
@@ -585,7 +585,7 @@ function* handelMessengerEvent(action) {
                       PreHash: json.PreHash,
                       Content: content,
                       SignedAt: json.Timestamp,
-                      CreatedAt: timestamp,
+                      // CreatedAt: timestamp,
                       Json: json,
                       Confirmed: 0,
                       Readed: 0
@@ -662,7 +662,7 @@ function* handelMessengerEvent(action) {
                   File: file,
                   Json: json,
                   SignedAt: json.Timestamp,
-                  CreatedAt: Date.now(),
+                  // CreatedAt: Date.now(),
                   PreHash: json.PreHash,
                   IsMark: false
                 }
@@ -1040,6 +1040,7 @@ function* LoadFollowBulletin() {
 }
 
 function* LoadBulletin(action) {
+  console.log(action)
   if (CommonDB === null) {
     yield call(initCommonDB)
   }
@@ -1048,11 +1049,22 @@ function* LoadBulletin(action) {
     MG = null
     return
   }
+  if (MG === null) {
+    yield call(initMessageGenerator, seed)
+  }
 
   let bulletin = yield call(() => CommonDB.Bulletins
     .where('Hash')
     .equals(action.payload.hash)
     .first())
+  if (bulletin === undefined) {
+    let to = action.payload.address
+    if (action.payload.to) {
+      to = action.payload.to
+    }
+    let msg = MG.genBulletinRequest(action.payload.address, action.payload.sequence, to)
+    yield call(SendMessage, { msg: msg })
+  }
   yield put(setCurrentBulletin(bulletin))
 }
 
@@ -1105,7 +1117,7 @@ function* PublishBulletin(action) {
     File: file,
     Json: bulletin_json,
     SignedAt: timestamp,
-    CreatedAt: timestamp,
+    // CreatedAt: timestamp,
     PreHash: bulletin_json.PreHash,
     IsMark: false
   }
@@ -1492,7 +1504,7 @@ function* SendContent({ payload }) {
           PreHash: CurrentSession.current_hash,
           Content: payload.content,
           SignedAt: timestamp,
-          CreatedAt: timestamp,
+          // CreatedAt: timestamp,
           Json: msg_json,
           Confirmed: 0,
           Readed: 1
@@ -1711,6 +1723,79 @@ function* ForwardBulletin({ payload }) {
   yield put(setFlashNoticeMessage({ message: `bulletin forward to ${payload.friend}`, duration: 3000 }))
 }
 
+// group
+function* ComposeMemberAdd({ payload }) {
+  const old_list = yield select(state => state.Messenger.ComposeMemberList)
+  let new_list = [...old_list]
+  new_list = new_list.filter(member => member != payload.address)
+  new_list.unshift(payload.address)
+  yield put(setComposeMemberList(new_list))
+}
+
+function* ComposeMemberDel({ payload }) {
+  const old_list = yield select(state => state.Messenger.ComposeMemberList)
+  let new_list = [...old_list]
+  new_list = new_list.filter(member => member != payload.address)
+  yield put(setComposeMemberList(new_list))
+}
+
+function* CreateGroup() {
+
+}
+
+// channel
+function* ComposeSpeakerAdd({ payload }) {
+  const old_list = yield select(state => state.Messenger.ComposeSpeakerList)
+  let new_list = [...old_list]
+  new_list = new_list.filter(speaker => speaker != payload.address)
+  new_list.unshift(payload.address)
+  if (new_list.length > 8) {
+    new_list = new_list.slice(0, 8)
+  }
+  yield put(setComposeSpeakerList(new_list))
+}
+
+function* ComposeSpeakerDel({ payload }) {
+  const old_list = yield select(state => state.Messenger.ComposeSpeakerList)
+  let new_list = [...old_list]
+  new_list = new_list.filter(speaker => speaker != payload.address)
+  yield put(setComposeSpeakerList(new_list))
+}
+
+function* CreateChannel(action) {
+  if (CommonDB === null) {
+    yield call(initCommonDB)
+  }
+  console.log(action)
+  const seed = yield select(state => state.User.Seed)
+  const address = yield select(state => state.User.Address)
+  const speaker = yield select(state => state.Messenger.ComposeSpeakerList)
+  if (!seed) {
+    MG = null
+    return
+  }
+  if (MG === null) {
+    yield call(initMessageGenerator, seed)
+  }
+
+  let hash = QuarterSHA512Message({ CreatedBy: address, Speaker: speaker, Random: Math.random() })
+  console.log(hash)
+  let json = MG.genChannelCreate(hash, action.payload.name, speaker)
+  let new_channel = {
+    Hash: json.Hash,
+    Name: json.Name,
+    CreatedBy: address,
+    Speaker: json.Speaker,
+    CreatedAt: json.Timestamp,
+    CreateJson: JSON.stringify(json)
+  }
+  console.log(json)
+  console.log(new_channel)
+  let result = yield call(() => CommonDB.Channels.add(new_channel))
+  yield call(SendMessage, { msg: JSON.stringify(json) })
+  yield put(setComposeSpeakerList([]))
+}
+
 export function* watchMessenger() {
   yield takeEvery('ConnectSwitch', ConnectSwitch)
   yield takeEvery('DisConnectSwitch', DisconnectSwitch)
@@ -1745,4 +1830,14 @@ export function* watchMessenger() {
   yield takeLatest('FetchChatFile', FetchChatFile)
   yield takeLatest('ShowForwardBulletin', ShowForwardBulletin)
   yield takeLatest('ForwardBulletin', ForwardBulletin)
+
+  // group
+  yield takeLatest('ComposeMemberAdd', ComposeMemberAdd)
+  yield takeLatest('ComposeMemberDel', ComposeMemberDel)
+  yield takeLatest('CreateGroup', CreateGroup)
+
+  // channel
+  yield takeLatest('ComposeSpeakerAdd', ComposeSpeakerAdd)
+  yield takeLatest('ComposeSpeakerDel', ComposeSpeakerDel)
+  yield takeLatest('CreateChannel', CreateChannel)
 }

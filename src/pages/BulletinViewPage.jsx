@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import Avatar from '../components/Avatar'
 import BulletinLink from '../components/Bulletin/BulletinLink'
 import BulletinContent from '../components/Bulletin/BulletinContent'
@@ -14,13 +14,19 @@ import { BsMarkdown, BsFiletypeTxt } from "react-icons/bs"
 import BulletinPublish from '../components/Bulletin/BulletinPublish'
 import BulletinForward from '../components/Bulletin/BulletinForward'
 
-export default function DrawPage() {
+export default function BulletinViewPage() {
 
   const [isMarkdown, setIsMarkdown] = useState(false)
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const bulletin_hash = searchParams.get('hash')
+  const bulletin_address = searchParams.get('address')
+  const bulletin_sequence = searchParams.get('sequence')
+  const sour_address = searchParams.get('sour_address')
 
   const dispatch = useDispatch()
 
-  const { bulletin_hash } = useParams()
+  // const { bulletin_hash } = useParams()
   const { ShowPublishFlag, ShowForwardFlag } = useSelector(state => state.Messenger)
   const { CurrentBulletin } = useSelector(state => state.Messenger)
 
@@ -28,7 +34,14 @@ export default function DrawPage() {
   }, [dispatch])
 
   useEffect(() => {
-    dispatch({ type: 'LoadBulletin', payload: { hash: bulletin_hash } })
+    dispatch({
+      type: 'LoadBulletin', payload: {
+        hash: bulletin_hash,
+        address: bulletin_address,
+        sequence: parseInt(bulletin_sequence),
+        to: sour_address
+      }
+    })
   }, [bulletin_hash])
 
   return (
@@ -36,13 +49,13 @@ export default function DrawPage() {
       {
         ShowPublishFlag &&
         <BulletinPublish />
-      } 
+      }
       {
         ShowForwardFlag &&
         <BulletinForward />
       }
       {
-        CurrentBulletin !== null &&
+        CurrentBulletin !== null && CurrentBulletin !== undefined &&
         <div className={`flex flex-row mx-2 mt-5`}>
           <div className={` flex flex-col justify-center items-center pt-5x`}>
             <div className='items-center flex flex-row justify-center'>
@@ -60,7 +73,7 @@ export default function DrawPage() {
               <div className='flex flex-wrap'>
                 {CurrentBulletin.Quote.map((quote, index) => (
                   <div key={quote.Hash} className='text-xs text-gray-200 mt-1 px-1'>
-                    <BulletinLink address={quote.Address} sequence={quote.Sequence} hash={quote.Hash} />
+                    <BulletinLink address={quote.Address} sequence={quote.Sequence} hash={quote.Hash} sour_address={CurrentBulletin.Address} />
                   </div>
                 ))}
               </div>

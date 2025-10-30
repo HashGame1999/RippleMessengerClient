@@ -6,21 +6,26 @@ import TextInput from '../../components/Form/TextInput'
 import ToggleSwitch from '../../components/ToggleSwitch'
 import Avatar from '../../components/Avatar'
 import TextTimestamp from '../../components/TextTimestamp'
-import { MdPostAdd } from "react-icons/md"
 import { IoCloseOutline } from "react-icons/io5"
-import { LiaUserFriendsSolid } from "react-icons/lia"
 import AvatarName from '../../components/AvatarName'
+import { AiOutlineUserAdd } from "react-icons/ai"
+import { MdOutlineVerifiedUser } from "react-icons/md"
+import { GrGroup, GrChannel } from "react-icons/gr"
 
 export default function TabContact() {
   const [contactAddress, setContactAddress] = useState('')
   const [contactNickname, setContactNickname] = useState('')
-  const [showUpdateContact, setShowUpdateContact] = useState(false)
+  const [showAddContact, setShowAddContact] = useState(false)
+  const [showCreateGroup, setShowCreateGroup] = useState(false)
+  const [showCreateChannel, setShowCreateChannel] = useState(false)
   const [showFriendRequest, setShowFriendRequest] = useState(false)
+
+  const [channelName, setChannelName] = useState('')
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const { ContactList, activeTabSetting } = useSelector(state => state.User)
-  const { FriendRequestList } = useSelector(state => state.Messenger)
+  const { FriendRequestList, ComposeMemberList, ComposeSpeakerList } = useSelector(state => state.Messenger)
 
   useEffect(() => {
     console.log(ContactList)
@@ -38,7 +43,7 @@ export default function TabContact() {
     })
     setContactAddress('')
     setContactNickname('')
-    setShowUpdateContact(false)
+    setShowAddContact(false)
   }
 
   const delContact = async (address) => {
@@ -62,6 +67,59 @@ export default function TabContact() {
     })
   }
 
+  const addComposeMember = async (address) => {
+    dispatch({
+      type: 'ComposeMemberAdd',
+      payload: {
+        address: address
+      }
+    })
+  }
+
+  const delComposeMember = async (address) => {
+    dispatch({
+      type: 'ComposeMemberDel',
+      payload: {
+        address: address
+      }
+    })
+  }
+
+  const createGroup = async () => {
+    dispatch({
+      type: 'CreateGroup'
+    })
+  }
+
+  const addComposeSpeaker = async (address) => {
+    dispatch({
+      type: 'ComposeSpeakerAdd',
+      payload: {
+        address: address
+      }
+    })
+  }
+
+  const delComposeSpeaker = async (address) => {
+    dispatch({
+      type: 'ComposeSpeakerDel',
+      payload: {
+        address: address
+      }
+    })
+  }
+
+  const createChannel = async () => {
+    dispatch({
+      type: 'CreateChannel',
+      payload: {
+        name: channelName
+      }
+    })
+    setChannelName('')
+    setShowCreateChannel(false)
+  }
+
   const acceptFriendRequest = async (address) => {
     dispatch({
       type: 'AcceptFriendRequest',
@@ -73,14 +131,17 @@ export default function TabContact() {
   return (
     <div className="tab-page">
       {
-        showUpdateContact &&
+        showAddContact &&
         <div className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-5 backdrop-blur-sm`}>
           <div className="flex flex-row items-center justify-center">
-            <button onClick={() => setShowUpdateContact(false)} className="flex flex-col items-center justify-center p-2 rounded-lg text-gray-500 bg-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">
+            <button onClick={() => setShowAddContact(false)} className="flex flex-col items-center justify-center p-2 rounded-lg text-gray-500 bg-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">
               <IoCloseOutline className='icon' /> cancel
             </button>
           </div>
-          <div>
+          <div className="mx-auto flex flex-col mt-4">
+            <div className="card-title">
+              Add/Update Contact
+            </div>
             <TextInput label={'Address:'} value={contactAddress} onChange={(e) => setContactAddress(e.target.value.trim())} />
             <TextInput label={'Nickname:'} value={contactNickname} onChange={(e) => setContactNickname(e.target.value.trim())} />
             <button
@@ -88,6 +149,131 @@ export default function TabContact() {
               disabled={contactAddress === '' || contactNickname === ''}
               onClick={() => addContact()}>
               Add/Update
+            </button>
+          </div>
+        </div>
+      }
+      {
+        showCreateGroup &&
+        <div className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-5 backdrop-blur-sm`}>
+          <div className="flex flex-row items-center justify-center">
+            <button onClick={() => setShowCreateGroup(false)} className="flex flex-col items-center justify-center p-2 rounded-lg text-gray-500 bg-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">
+              <IoCloseOutline className='icon' /> cancel
+            </button>
+          </div>
+          <div className="mx-auto flex flex-col mt-4">
+            <div className="card-title">
+              Create Group
+            </div>
+            <div className="max-w-7xl overflow-x-auto overflow-y-auto whitespace-normal break-words p-2 rounded-xl shadow-2xl items-center">
+              {
+                ComposeMemberList.length > 0 ?
+                  <div className='flex flex-wrap'>
+                    {
+                      ComposeMemberList.map((member, index) => (
+                        <div key={member} className='mt-1 px-1 flex flex-col justify-center items-center' onClick={() => delComposeMember(member)}>
+                          <Avatar address={member} timestamp={Date.now()} style={'avatar'} />
+                          <AvatarName address={member} />
+                        </div>
+                      ))
+                    }
+                  </div>
+                  :
+                  <div>
+                    no group member yet...
+                  </div>
+              }
+              <hr />
+              {
+                ContactList.length > 0 ?
+                  <div className='flex flex-wrap'>
+                    {
+                      ContactList.map((contact, index) => (
+                        <div key={contact.Address} className='mt-1 px-1 flex flex-col justify-center items-center' onClick={() => addComposeMember(contact.Address)}>
+                          <Avatar address={contact.Address} timestamp={Date.now()} style={'avatar-sm'} />
+                          <div>
+                            <span className='avatar-name text-xs' title={contact.Address}>
+                              {contact.Nickname}
+                            </span>
+                          </div>
+                        </div>
+                      ))
+                    }
+                  </div>
+                  :
+                  <div>
+                    no contact yet...
+                  </div>
+              }
+            </div>
+            <button
+              className="btn-primary"
+              disabled={ComposeMemberList.length === 0}
+              onClick={() => createGroup()}>
+              Create
+            </button>
+          </div>
+        </div>
+      }
+      {
+        showCreateChannel &&
+        <div className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-5 backdrop-blur-sm`}>
+          <div className="flex flex-row items-center justify-center">
+            <button onClick={() => setShowCreateChannel(false)} className="flex flex-col items-center justify-center p-2 rounded-lg text-gray-500 bg-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">
+              <IoCloseOutline className='icon' /> cancel
+            </button>
+          </div>
+          <div className="mx-auto flex flex-col mt-4">
+            <div className="card-title">
+              Create Channel
+            </div>
+            <div className="max-w-7xl overflow-x-auto overflow-y-auto whitespace-normal break-words p-2 rounded-xl shadow-2xl items-center">
+              <TextInput label={'Channel Name:'} value={channelName} onChange={(e) => setChannelName(e.target.value.trim())} />
+              {
+                ComposeSpeakerList.length > 0 ?
+                  <div className='flex flex-wrap'>
+                    {
+                      ComposeSpeakerList.map((speaker, index) => (
+                        <div key={speaker} className='mt-1 px-1 flex flex-col justify-center items-center' onClick={() => delComposeSpeaker(speaker)}>
+                          <Avatar address={speaker} timestamp={Date.now()} style={'avatar'} />
+                          <AvatarName address={speaker} />
+                        </div>
+                      ))
+                    }
+                  </div>
+                  :
+                  <div>
+                    no channel speaker yet...
+                  </div>
+              }
+              <hr />
+              {
+                ContactList.length > 0 ?
+                  <div className='flex flex-wrap'>
+                    {
+                      ContactList.map((contact, index) => (
+                        <div key={contact.Address} className='mt-1 px-1 flex flex-col justify-center items-center' onClick={() => addComposeSpeaker(contact.Address)}>
+                          <Avatar address={contact.Address} timestamp={Date.now()} style={'avatar-sm'} />
+                          <div>
+                            <span className='avatar-name text-xs' title={contact.Address}>
+                              {contact.Nickname}
+                            </span>
+                          </div>
+                        </div>
+                      ))
+                    }
+                  </div>
+                  :
+                  <div>
+                    no contact yet...
+                  </div>
+              }
+            </div>
+            <button
+              className="btn-primary"
+              disabled={ComposeSpeakerList.length === 0}
+              onClick={() => createChannel()}>
+              Create
             </button>
           </div>
         </div>
@@ -148,10 +334,12 @@ export default function TabContact() {
         <div className="min-w-full p-2 flex gap-1 rounded-lg shadow-xl justify-center">
           <div className={`mt-1 flex-1`}>
             <div className='flex flex-row'>
-              <MdPostAdd className="icon" onClick={() => setShowUpdateContact(true)} />
+              <AiOutlineUserAdd className="icon" onClick={() => setShowAddContact(true)} />
+              <GrGroup className="icon" onClick={() => setShowCreateGroup(true)} />
+              <GrChannel className="icon" onClick={() => setShowCreateChannel(true)} />
               {
                 FriendRequestList.length > 0 &&
-                <LiaUserFriendsSolid className="icon" onClick={() => setShowFriendRequest(true)} />
+                <MdOutlineVerifiedUser className="icon" onClick={() => setShowFriendRequest(true)} />
               }
             </div>
             {

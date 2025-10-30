@@ -709,16 +709,103 @@ function checkChatMessageSyncSchema(json) {
 }
 
 // >>>group<<<
+// Action>>>
+const GroupSyncSchema = {
+  "type": "object",
+  "required": ["Action", "Timestamp", "PublicKey", "Signature"],
+  "maxProperties": 5,
+  "properties": {
+    "Action": {
+      "type": "number",
+      "const": ActionCode.GroupSync
+    },
+    "To": {
+      "type": "string"
+    },
+    "Timestamp": {
+      "type": "number"
+    },
+    "PublicKey": {
+      "type": "string"
+    },
+    "Signature": {
+      "type": "string"
+    }
+  }
+}
+const vGroupSyncSchema = ajv.compile(GroupSyncSchema)
+function checkGroupSyncSchema(json) {
+  try {
+    if (vGroupSyncSchema(json)) {
+      ConsoleWarn(`GroupSyncSchema ok`)
+      return true
+    } else {
+      ConsoleWarn(`GroupSyncSchema invalid`)
+      return false
+    }
+  } catch (e) {
+    return false
+  }
+}
+
+const GroupMessageSyncSchema = {
+  "type": "object",
+  "required": ["Action", "GroupHash", "Address", "CurrentSequence", "To", "Timestamp", "PublicKey", "Signature"],
+  "maxProperties": 8,
+  "properties": {
+    "Action": {
+      "type": "number",
+      "const": ActionCode.GroupMessageSync
+    },
+    "GroupHash": {
+      "type": "string"
+    },
+    "Address": {
+      "type": "string"
+    },
+    "CurrentSequence": {
+      "type": "number"
+    },
+    "To": {
+      "type": "string"
+    },
+    "Timestamp": {
+      "type": "number"
+    },
+    "PublicKey": {
+      "type": "string"
+    },
+    "Signature": {
+      "type": "string"
+    }
+  }
+}
+const vGroupMessageSyncSchema = ajv.compile(GroupMessageSyncSchema)
+function checkGroupMessageSyncSchema(json) {
+  try {
+    if (vGroupMessageSyncSchema(json)) {
+      ConsoleWarn(`GroupMessageSyncSchema ok`)
+      return true
+    } else {
+      ConsoleWarn(`GroupMessageSyncSchema invalid`)
+      return false
+    }
+  } catch (e) {
+    return false
+  }
+}
+
+// Object>>>
 const GroupCreateSchema = {
   "type": "object",
-  "required": ["ObjectType", "GroupID", "Member", "Timestamp", "PublicKey", "Signature"],
+  "required": ["ObjectType", "Hash", "Member", "Timestamp", "PublicKey", "Signature"],
   "maxProperties": 6,
   "properties": {
     "ObjectType": {
       "type": "number",
       "const": ObjectType.GroupCreate
     },
-    "GroupID": {
+    "Hash": {
       "type": "string"
     },
     "Member": {
@@ -757,14 +844,14 @@ function checkGroupCreateSchema(json) {
 
 const GroupDeleteSchema = {
   "type": "object",
-  "required": ["ObjectType", "GroupID", "Timestamp", "PublicKey", "Signature"],
+  "required": ["ObjectType", "Hash", "Timestamp", "PublicKey", "Signature"],
   "maxProperties": 7,
   "properties": {
     "ObjectType": {
       "type": "number",
       "const": ObjectType.GroupDelete
     },
-    "GroupID": {
+    "Hash": {
       "type": "string"
     },
     "Timestamp": {
@@ -795,14 +882,14 @@ function checkGroupDeleteSchema(json) {
 
 const GroupMessageSchema = {
   "type": "object",
-  "required": ["ObjectType", "GroupID", "Sequence", "PreHash", "Content", "Timestamp", "PublicKey", "Signature"],
+  "required": ["ObjectType", "GroupHash", "Sequence", "PreHash", "Content", "Timestamp", "PublicKey", "Signature"],
   "maxProperties": 9,
   "properties": {
     "ObjectType": {
       "type": "number",
       "const": ObjectType.GroupMessage
     },
-    "GroupID": {
+    "GroupHash": {
       "type": "string"
     },
     "Sequence": {
@@ -851,16 +938,103 @@ function checkGroupMessageSchema(json) {
 }
 
 // >>>channel<<<
+// Action>>>
+const ChannelSyncSchema = {
+  "type": "object",
+  "required": ["Action", "Timestamp", "PublicKey", "Signature"],
+  "maxProperties": 5,
+  "properties": {
+    "Action": {
+      "type": "number",
+      "const": ActionCode.ChannelSync
+    },
+    "To": {
+      "type": "string"
+    },
+    "Timestamp": {
+      "type": "number"
+    },
+    "PublicKey": {
+      "type": "string"
+    },
+    "Signature": {
+      "type": "string"
+    }
+  }
+}
+const vChannelSyncSchema = ajv.compile(ChannelSyncSchema)
+function checkChannelSyncSchema(json) {
+  try {
+    if (vChannelSyncSchema(json)) {
+      ConsoleWarn(`ChannelSyncSchema ok`)
+      return true
+    } else {
+      ConsoleWarn(`ChannelSyncSchema invalid`)
+      return false
+    }
+  } catch (e) {
+    return false
+  }
+}
+
+const ChannelMessageSyncSchema = {
+  "type": "object",
+  "required": ["Action", "ChannelHash", "Address", "CurrentSequence", "Timestamp", "PublicKey", "Signature"],
+  "maxProperties": 8,
+  "properties": {
+    "Action": {
+      "type": "number",
+      "const": ActionCode.ChannelMessageSync
+    },
+    "ChannelHash": {
+      "type": "string"
+    },
+    "Address": {
+      "type": "string"
+    },
+    "CurrentSequence": {
+      "type": "number"
+    },
+    "To": {
+      "type": "string"
+    },
+    "Timestamp": {
+      "type": "number"
+    },
+    "PublicKey": {
+      "type": "string"
+    },
+    "Signature": {
+      "type": "string"
+    }
+  }
+}
+const vChannelMessageSyncSchema = ajv.compile(ChannelMessageSyncSchema)
+function checkChannelMessageSyncSchema(json) {
+  try {
+    if (vChannelMessageSyncSchema(json)) {
+      ConsoleWarn(`ChannelMessageSyncSchema ok`)
+      return true
+    } else {
+      ConsoleWarn(`ChannelMessageSyncSchema invalid`)
+      return false
+    }
+  } catch (e) {
+    return false
+  }
+}
+
+// Object>>>
 const ChannelCreateSchema = {
   "type": "object",
-  "required": ["ObjectType", "ChannelID", "ChannelName", "Speaker", "Timestamp", "PublicKey", "Signature"],
+  "required": ["ObjectType", "Hash", "ChannelName", "Speaker", "Timestamp", "PublicKey", "Signature"],
   "maxProperties": 7,
   "properties": {
     "ObjectType": {
       "type": "number",
       "const": ObjectType.ChannelCreate
     },
-    "ChannelID": {
+    "Hash": {
       "type": "string"
     },
     "ChannelName": {
@@ -902,14 +1076,14 @@ function checkChannelCreateSchema(json) {
 
 const ChannelDeleteSchema = {
   "type": "object",
-  "required": ["Action", "To", "PairSequence", "SelfSequence", "Timestamp", "PublicKey", "Signature"],
-  "maxProperties": 7,
+  "required": ["ObjectType", "Hash", "Timestamp", "PublicKey", "Signature"],
+  "maxProperties": 5,
   "properties": {
-    "Action": {
+    "ObjectType": {
       "type": "number",
       "const": ObjectType.ChannelDelete
     },
-    "ChannelID": {
+    "Hash": {
       "type": "string"
     },
     "Timestamp": {
@@ -940,14 +1114,14 @@ function checkChannelDeleteSchema(json) {
 
 const ChannelMessageSchema = {
   "type": "object",
-  "required": ["ObjectType", "Sequence", "PreHash", "Content", "To", "Timestamp", "PublicKey", "Signature"],
+  "required": ["ObjectType", "ChannelHash", "Sequence", "PreHash", "Content", "Timestamp", "PublicKey", "Signature"],
   "maxProperties": 9,
   "properties": {
     "ObjectType": {
       "type": "number",
       "const": ObjectType.ChannelMessage
     },
-    "ChannelID": {
+    "ChannelHash": {
       "type": "string"
     },
     "Sequence": {
@@ -967,9 +1141,6 @@ const ChannelMessageSchema = {
       }
     },
     "Content": {
-      "type": "string"
-    },
-    "To": {
       "type": "string"
     },
     "Timestamp": {
@@ -997,7 +1168,6 @@ function checkChannelMessageSchema(json) {
     return false
   }
 }
-
 //client
 
 // MessageObject
@@ -1090,10 +1260,16 @@ export {
   checkChatMessageSchema,
   checkChatMessageSyncSchema,
 
+  // group
+  checkGroupSyncSchema,
+  checkGroupMessageSyncSchema,
   checkGroupCreateSchema,
   checkGroupDeleteSchema,
   checkGroupMessageSchema,
 
+  // channel
+  checkChannelSyncSchema,
+  checkChannelMessageSyncSchema,
   checkChannelCreateSchema,
   checkChannelDeleteSchema,
   checkChannelMessageSchema,

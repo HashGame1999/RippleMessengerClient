@@ -43,15 +43,18 @@ const CommonDBSchame = {
 
   Files: `Hash&, Size, UpdatedAt, ChunkLength, ChunkCursor`,
 
-  Bulletins: `Hash&, Address, Sequence, Content, Quote, File, Json, SignedAt, CreatedAt, PreHash, NextHash, IsMark, [Address+Sequence]`,
+  Bulletins: `Hash&, Address, Sequence, Content, Quote, File, Json, SignedAt, PreHash, NextHash, IsMark, [Address+Sequence]`,
 
   ECDHS: `[SelfAddress+PairAddress+Partition+Sequence]&, SelfAddress, PairAddress, Partition, Sequence, AesKey, PrivateKey, PublicKey, SelfJson, PairJson`,
-  Messages: `Hash&, Sour, Dest, Sequence, PreHash, Content, SignedAt, CreatedAt, Json, Confirmed, Readed, IsObject, ObjectType, [Sour+Dest+Confirmed]`,
+  Messages: `Hash&, Sour, Dest, Sequence, PreHash, Content, SignedAt, Json, Confirmed, Readed, IsObject, ObjectType, [Sour+Dest+Confirmed]`,
   ChatFiles: `EHash&, Hash, Size, Address1, Address2`,
   FriendRequests: `[Local+Remote]&, Local, Remote, UpdatedAt`,
 
-  Channels: `ID&, Name, CreatedBy, Speaker, SignedAt, CreatedAt, CreateJson, DeleteddAt, DeleteJson`,
-  ChannelMessages: `Hash&, ChannelID, Sequence, PreHash, Content, SignedAt, CreatedAt, Json, Confirmed, Readed, IsObject, ObjectType`,
+  Channels: `Hash&, Name, CreatedBy, Speaker, CreatedAt, CreateJson, DeleteddAt, DeleteJson`,
+  ChannelMessages: `Hash&, ChannelHash, Sequence, PreHash, Content, CreatedAt, Json, Confirmed, Readed, IsObject, ObjectType`,
+
+  Groups: `Hash&, Name, CreatedBy, Member, CreatedAt, CreateJson, DeleteddAt, DeleteJson`,
+  GroupMessages: `Hash&, GroupHash, Sequence, PreHash, Content, CreatedAt, Json, Confirmed, Readed, IsObject, ObjectType`,
 }
 
 export {

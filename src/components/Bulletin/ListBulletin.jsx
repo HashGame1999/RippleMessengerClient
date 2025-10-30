@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { createSearchParams, useNavigate } from 'react-router-dom'
 import { BulletinPreviewSize } from '../../lib/MessengerConst'
 import BulletinContent from './BulletinContent'
 import Avatar from '../Avatar'
@@ -20,6 +20,14 @@ const ListBulletin = ({ bulletin, textSize = 'text-base' }) => {
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
+
+  const goto_bulletin = () => {
+    const params = { hash: bulletin.Hash, address: bulletin.Address, sequence: bulletin.Sequence };
+    navigate({
+      pathname: '/bulletin_view',
+      search: `?${createSearchParams(params)}`
+    })
+  }
 
   return (
     <div className={`${textSize}`}>
@@ -48,9 +56,9 @@ const ListBulletin = ({ bulletin, textSize = 'text-base' }) => {
       </div>
 
       {bulletin.Content.length <= BulletinPreviewSize ?
-        <BulletinContent content={bulletin.Content} onClick={() => navigate(`/bulletin_view/${bulletin.Hash}`)} />
+        <BulletinContent content={bulletin.Content} onClick={() => goto_bulletin()} />
         :
-        <BulletinContent content={bulletin.Content.slice(0, BulletinPreviewSize)} onClick={() => navigate(`/bulletin_view/${bulletin.Hash}`)} />
+        <BulletinContent content={bulletin.Content.slice(0, BulletinPreviewSize)} onClick={() => goto_bulletin()} />
       }
     </div>
   )

@@ -13,7 +13,6 @@ const MessageInterval = 1000
 const PrivateChatECDHString = 'private-chat-ecdh'
 const PrivateChatAESString = 'private-chat-ecdh-to-aes-256'
 
-//constant
 const ActionCode = {
   Declare: 100,
   ObjectResponse: 101,
@@ -22,25 +21,19 @@ const ActionCode = {
 
   BulletinRequest: 200,
   BulletinRandomRequest: 201,
-
+  BulletinFileChunkRequest: 202,
   BulletinAddressListRequest: 203,
   BulletinAddressListResponse: 204,
-
   BulletinReplyListRequest: 205,
   BulletinReplyListResponse: 206,
 
   ChatMessageSync: 301,
-  // ChatMessageSyncFromServer: 302,
-  ChatFileRequest: 303,
-  // ChatFileChunkRequest: 304,
-  // ObjectResponse
 
-  // GroupRequest: 401,
-  // GroupManageSync: 402,
-  // GroupDH: 403,
-  GroupMessageSyncRequest: 401,
-  GroupMessageSyncResponse: 402,
-  // GroupFileRequest: 405
+  GroupSync: 401,
+  GroupMessageSync: 402,
+
+  ChannelSync: 501,
+  ChannelMessageSync: 502,
 }
 
 const ObjectType = {
@@ -58,11 +51,7 @@ const ObjectType = {
 
   ChannelCreate: 401,
   ChannelDelete: 402,
-  ChannelMessage: 403,
-
-  // GroupManage: 301,
-  // GroupMessage: 302,
-  // GroupFileChunk: 303
+  ChannelMessage: 403
 }
 
 const FileRequestType = {
